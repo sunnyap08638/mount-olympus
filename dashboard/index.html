@@ -22,6 +22,7 @@
       <a href="#workloads" data-view="workloads"><span data-icon="layers"></span>Workloads</a>
       <a href="#storage" data-view="storage"><span data-icon="disk"></span>Storage</a>
       <a href="#worker" data-view="worker"><span data-icon="bolt"></span>GPU Worker</a>
+      <a href="#clio" data-view="clio"><span data-icon="video"></span>Clio</a>
     </nav>
     <div class="nav-label learn-label">RESOURCES</div>
     <nav aria-label="Resources">
@@ -84,6 +85,127 @@
               <p>Sunshine on Windows and Moonlight on your client can stream the full desktop and games. Pair them on your LAN first, then use a private Tailscale connection for off-site access.</p><a class="text-link" href="#learn">See the connection plan ↗</a></div></section>
           </div>
         </div>
+      </section>
+      <section class="view" id="clio" hidden>
+        <div class="page-heading"><div><div class="eyebrow"><i></i> MEDIA</div><h1>Project Clio</h1>
+          <p>Find YouTube highlights, trim clips, and review them before uploading.</p></div></div>
+        <nav class="clio-tabs" aria-label="Project Clio">
+          <a href="#clio" id="clio-search-tab">Find clips</a>
+          <a href="#clio-weekly" id="clio-weekly-tab">Weekly clips</a>
+        </nav>
+        <div id="clio-search-panel">
+        <section class="panel"><div class="panel-head"><div><h2>Find clips</h2><p>Enter a topic or paste a YouTube video link.</p></div></div>
+          <div class="panel-body prose">
+            <form id="clio-form"><label class="sr-only" for="clio-topic">Topic or YouTube link</label>
+              <textarea id="clio-topic" placeholder="GTA 5 roleplay from the past 6 days" rows="2" maxlength="160" required></textarea>
+              <div class="clio-actions">
+                <label>Clipping mode
+                  <select id="clio-mode">
+                    <option value="review">Review suggested clips</option>
+                    <option value="manual">Choose clips myself</option>
+                  </select>
+                </label>
+                <button id="clio-submit" class="primary" type="submit">Find clips</button>
+              </div>
+            </form>
+            <p id="clio-status" role="status"></p>
+            <p id="clio-notice" role="status"></p>
+            <ul id="clio-youtube-status" aria-label="YouTube uploads" aria-live="polite" hidden></ul>
+          </div>
+        </section>
+        <section class="panel" id="clio-preview" hidden>
+          <div class="panel-head"><div><h2>Chosen video</h2><p><a id="clio-source" target="_blank" rel="noopener">Open on YouTube</a></p></div></div>
+          <div class="panel-body prose">
+            <iframe id="clio-player" title="Chosen YouTube video" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <form id="clio-manual" hidden>
+              <h3>Trim your own clip</h3>
+              <p>Drag either handle to trim, or drag the highlighted range to move it.</p>
+              <div class="clio-trim-times"><span id="clio-trim-window-start"></span><span id="clio-trim-window-end"></span></div>
+              <div id="clio-trim-track" class="clio-trim-track">
+                <button type="button" id="clio-trim-selection" aria-label="Move selected range"></button>
+                <button type="button" id="clio-trim-in" role="slider" aria-label="Clip start"></button>
+                <button type="button" id="clio-trim-out" role="slider" aria-label="Clip end"></button>
+              </div>
+              <div id="clio-trim-summary" class="clio-trim-summary"></div>
+              <label class="clio-trim-position">Move along the full video
+                <input id="clio-trim-position" type="range" min="0" step="1">
+              </label>
+              <div class="clio-actions">
+                <label>Clip slot <select id="clio-slot"></select></label>
+                <button type="button" id="clio-preview-range">Preview range</button>
+                <button type="button" id="clio-full-video">Full video</button>
+                <button class="primary" type="submit">Render clip</button>
+              </div>
+            </form>
+            <form id="clio-review">
+              <h3 id="clio-highlights" hidden>Highlighted clips</h3>
+              <div id="clio-clips"></div>
+              <div class="clio-actions" id="clio-review-actions" hidden>
+                <button type="button" id="clio-reject">Reject whole video</button>
+                <button type="button" id="clio-generate" class="primary" hidden>Generate clips</button>
+                <label id="clio-destination-label" hidden>Destination
+                  <select id="clio-destination">
+                    <option value="youtube">YouTube</option>
+                    <option value="desktop">MacBook Desktop</option>
+                  </select>
+                </label>
+                <button type="submit" id="clio-save" class="primary">Review approved clips…</button>
+              </div>
+            </form>
+          </div>
+        </section>
+        </div>
+        <div id="clio-weekly-panel" hidden>
+          <section class="panel">
+            <div class="panel-head"><div><h2>Weekly clips</h2><p>Play the clips, approve the ones you want, and send them to YouTube or your MacBook Desktop.</p></div></div>
+            <div class="panel-body prose">
+              <p id="clio-batch-status" role="status"></p>
+              <div class="clio-actions" id="clio-batch-actions" hidden>
+                <button type="button" id="clio-batch-select">Select all</button>
+                <label>Destination
+                  <select id="clio-batch-destination">
+                    <option value="youtube">YouTube</option>
+                    <option value="desktop">MacBook Desktop</option>
+                  </select>
+                </label>
+                <button type="button" id="clio-batch-upload" class="primary" disabled>Review upload</button>
+              </div>
+              <p id="clio-batch-caption-help" hidden>Previews show the original cut. Clio applies your caption choice when it sends the clip.</p>
+              <div id="clio-batch-clips"></div>
+              <section id="clio-batch-activity" hidden>
+                <h3>Recent deliveries</h3>
+                <ul id="clio-batch-results" aria-live="polite"></ul>
+              </section>
+            </div>
+          </section>
+          <section class="panel clio-weekly">
+            <div class="panel-head"><div><h2>Weekly trending sources</h2><p>Top videos at least 2 minutes long from U.S. YouTube charts and trending searches over the last seven days.</p></div>
+              <button id="clio-weekly-scan" type="button">Scan this week</button>
+            </div>
+            <div class="panel-body prose">
+              <p id="clio-weekly-schedule" hidden>Clio scans and prepares clips on Sundays at 9 a.m. Eastern.</p>
+              <p id="clio-weekly-status" role="status"></p>
+              <ol id="clio-weekly-items"></ol>
+            </div>
+          </section>
+        </div>
+        <dialog id="clio-youtube-dialog" aria-labelledby="clio-youtube-title">
+          <form id="clio-youtube-form">
+            <h2 id="clio-youtube-title">Upload to YouTube</h2>
+            <p id="clio-youtube-channel"></p>
+            <label id="clio-youtube-channel-choice" hidden>YouTube channel
+              <select id="clio-youtube-channel-select" required disabled></select>
+            </label>
+            <p id="clio-youtube-error" role="alert"></p>
+            <div id="clio-youtube-drafts"></div>
+            <p id="clio-approval-details"></p>
+            <p id="clio-youtube-terms">By clicking ‘Upload,’ you certify that the content you are uploading complies with the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a> (including the YouTube Community Guidelines). Please be sure not to violate others’ copyright or privacy rights.</p>
+            <div class="clio-actions">
+              <button type="button" id="clio-youtube-cancel">Cancel</button>
+              <button type="submit" id="clio-youtube-confirm" class="primary" disabled>Upload to YouTube</button>
+            </div>
+          </form>
+        </dialog>
       </section>
       <section class="view" id="learn" hidden>
         <div class="page-heading"><div><div class="eyebrow"><i></i> FIELD GUIDE</div><h1>How it works</h1><p>Follow a reading or an action from the page to the hardware.</p></div></div>
